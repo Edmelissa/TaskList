@@ -6,11 +6,9 @@ import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.tasklist.databinding.TaskItemBinding
-import java.util.Collections
 
 class TasksAdapter(private val actionListener: TaskActionListener) :
     RecyclerView.Adapter<TasksAdapter.TasksViewHolder>(),
@@ -75,10 +73,8 @@ class TasksAdapter(private val actionListener: TaskActionListener) :
         popupMenu.show()
     }
 
-    fun swapItems(fromPosition: Int, toPosition: Int) {
-        Collections.swap(tasks, fromPosition, toPosition)
-
-        notifyItemMoved(fromPosition, toPosition)
+    fun moveItems(fromPosition: Int, toPosition: Int) {
+        actionListener.onTaskSwap(fromPosition, toPosition)
     }
 
     companion object{
@@ -88,4 +84,6 @@ class TasksAdapter(private val actionListener: TaskActionListener) :
 
 interface TaskActionListener{
     fun onTaskDelete(task: Task)
+
+    fun onTaskSwap(currentPosition : Int, targetPosition: Int)
 }

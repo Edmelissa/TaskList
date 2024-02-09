@@ -21,8 +21,8 @@ class TaskDataSource {
         }
     }
 
-    fun swapTasks(fromPosition: Int, toPosition: Int){
-        Collections.swap(taskList, fromPosition, toPosition)
+    fun moveTask(currentPosition : Int, targetPosition : Int){
+        Collections.swap(taskList, currentPosition, targetPosition)
         notifyChanges()
     }
 

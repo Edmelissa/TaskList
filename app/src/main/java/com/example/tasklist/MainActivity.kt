@@ -3,26 +3,18 @@ package com.example.tasklist
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.tasklist.databinding.ActivityMainBinding
-import java.util.Collections
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var taskDataSource: TaskDataSource
     private lateinit var adapter: TasksAdapter
-
-    private var taskName = ""
-    private var taskImage = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +28,10 @@ class MainActivity : AppCompatActivity() {
             object : TaskActionListener{
                 override fun onTaskDelete(task: Task) {
                     taskDataSource.deleteTask(task)
+                }
+
+                override fun onTaskSwap(currentPosition : Int, targetPosition: Int) {
+                    taskDataSource.moveTask(currentPosition, targetPosition)
                 }
             }
         )
@@ -53,8 +49,10 @@ class MainActivity : AppCompatActivity() {
         val dividerItemDecoration = DividerItemDecoration(this , layoutManager.orientation)
         binding.recyclerView.addItemDecoration(dividerItemDecoration)
 
-        val callback = DragManageAdapter(adapter, this,
-            ItemTouchHelper.UP.or(ItemTouchHelper.DOWN), ItemTouchHelper.LEFT.or(ItemTouchHelper.RIGHT))
+        val callback = DragManageAdapter(
+            adapter, ItemTouchHelper.UP.or(ItemTouchHelper.DOWN),
+            ItemTouchHelper.LEFT.or(ItemTouchHelper.RIGHT)
+        )
         val helper = ItemTouchHelper(callback)
         helper.attachToRecyclerView(binding.recyclerView)
 
@@ -70,8 +68,8 @@ class MainActivity : AppCompatActivity() {
 
     private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             result: ActivityResult -> if (result.resultCode == RESULT_OK) {
-        taskName = result.data?.getStringExtra("create_task_name").toString()
-        taskImage = result.data?.getStringExtra("create_task_image").toString()
+        var taskName = result.data?.getStringExtra("create_task_name").toString()
+        var taskImage = result.data?.getStringExtra("create_task_image").toString()
 
         taskDataSource.addTask(
             Task(
